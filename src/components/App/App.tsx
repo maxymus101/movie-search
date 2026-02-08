@@ -33,7 +33,6 @@ export default function App() {
   const totalPages = data?.total_pages ?? 0;
 
   useEffect(() => {
-    console.log("useEfect IF RUN!");
     if (isSuccess && query && data?.results.length === 0) {
       toast.error("No movies found for your request.", {
         id: "no-movies",
