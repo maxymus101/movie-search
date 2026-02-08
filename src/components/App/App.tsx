@@ -9,7 +9,7 @@ import MovieModal from "../MovieModal/MovieModal";
 import css from "./App.module.css";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import ReactPaginate from "react-paginate";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function App() {
   const [query, setQuery] = useState("");
@@ -20,6 +20,7 @@ export default function App() {
   const { data, isLoading, isError, isSuccess } = useQuery({
     queryKey: ["movies", query, currentPage],
     queryFn: () => fetchMovies(query, currentPage),
+    enabled: query !== "",
     placeholderData: keepPreviousData,
   });
 
@@ -30,18 +31,18 @@ export default function App() {
   const closeModal = () => setIsModalOpen(false);
 
   const totalPages = data?.total_pages ?? 0;
-  const notifyNoMoviesFound = () => {
-    toast.error("No movies found for your request.", {
-      style: { background: "rgba(125, 183, 255, 0.8)" },
-      icon: "ℹ️",
-    });
-  };
 
   useEffect(() => {
-    if (isSuccess && query && (data?.results || []).length === 0) {
-      notifyNoMoviesFound();
+    console.log("useEfect IF RUN!");
+    if (isSuccess && query && data?.results.length === 0) {
+      toast.error("No movies found for your request.", {
+        id: "no-movies",
+        style: { background: "rgba(125, 183, 255, 0.8)" },
+        icon: "ℹ️",
+        duration: 1500,
+      });
     }
-  }, [isSuccess, data, query]);
+  }, [data, isSuccess, query]);
 
   const handleSearch = async (query: string) => {
     setQuery(query);
@@ -64,6 +65,7 @@ export default function App() {
           previousLabel="←"
         />
       )}
+      <Toaster />
       {isLoading && <Loader />}
       {isError && <ErrorMessage />}
       {data && data.results.length > 0 && (
